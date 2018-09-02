@@ -1,4 +1,4 @@
-![Stenotype Icon](Assets/stenotype_icon.png)
+![Stenotype Icon](Assets/stenotype_icon.png | width=150)
 # Stenotype 
 Stenotype is a helper class library for working with the Revit API. It consists of .NET helper/extension wrapper classes and methods for writing modular Revit API code, faster (and only once). The classes can be used for any custom Revit tools/scripts. The main code library to reference is the compiled .dll from the C# Stenotype library in this repository.
 
