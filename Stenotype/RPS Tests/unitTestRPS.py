@@ -29,4 +29,5 @@ lineStylesCategory = doc.Settings.Categories.get_Item(BuiltInCategory.OST_Lines)
 lineStyleSubTypes = lineStylesCategory.SubCategories
 
 for lineStyle in lineStyleSubTypes:
-	testObj = ST.LinestyleST(doc, lineStyle)
+	linestyleST = ST.LinestyleST(doc, lineStyle)
+	pp.pprint(linestyleST.Serialized)

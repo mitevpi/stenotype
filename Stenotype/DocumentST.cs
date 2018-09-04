@@ -30,58 +30,67 @@ namespace Stenotype
         /// The document.
         /// </summary>
         [NonSerialized()] public readonly Document Doc;
-        [JsonProperty()] private string DocString { get => Doc.Title.ToString(); set { } }
+        [JsonProperty()] private string DocString => Doc.Title.ToString();
 
         /// <summary>
         /// The Application hosting the document.
         /// </summary>
         [NonSerialized()] public readonly Application App;
-        [JsonProperty()] private string AppString { get => App.ToString(); set { } }
+        [JsonProperty()] private string AppString => App.ToString();
 
         /// <summary>
         /// The parent UI Application instance.
         /// </summary>
         [NonSerialized()] public readonly UIApplication UiApp;
-        [JsonProperty()] private string UiAppString { get => UiApp.ToString(); set { } }
+        [JsonProperty()] private string UiAppString => UiApp.ToString();
 
         /// <summary>
         /// The parent UIDocument instance.
         /// </summary>
         [NonSerialized()] public readonly UIDocument UiDoc;
-        [JsonProperty()] private string UiDocString { get => UiDoc.ToString(); set { } }
+        [JsonProperty()] private string UiDocString => UiDoc.ToString();
 
         /// <summary>
         /// The active view of the document at the time of instantiating this class.
         /// </summary>
         [NonSerialized()] public readonly View ActiveView;
-        [JsonProperty()] private string ActiveViewString { get => ActiveView.ToString(); set { } }
+        [JsonProperty()] private string ActiveViewString => ActiveView.Title.ToString();
 
         /// <summary>
         /// A dictionary of reference types, and reference paths for the files linked to the source Revit document.
         /// </summary>
         [NonSerialized()] public readonly Dictionary<ExternalFileReferenceType, string> RefDict;
 
+        private readonly string _versionNumber;
+        private readonly string _versionName;
+        private readonly string _versionBuild;
+        private readonly string _userName;
+        private readonly string _title;
 
         /// <summary>
         /// The Revit Version Number.
         /// </summary>
-        public string VersionNumber { get; }
+        public string VersionNumber => _versionNumber;
+
         /// <summary>
         /// The name of the Revit Version.
         /// </summary>
-        public string VersionName { get; }
+        public string VersionName => _versionName;
+
         /// <summary>
         /// The Revit Build Number.
         /// </summary>
-        public string VersionBuild { get; }
+        public string VersionBuild => _versionBuild;
+
         /// <summary>
         /// The title of the Revit document.
         /// </summary>
-        public string Title { get; }
+        public string Title => _title;
+
         /// <summary>
         /// The user name associated with the Revit instance which instantiated this class.
         /// </summary>
-        public string UserName { get; }
+        public string UserName => _userName;
 
         /// <summary>
         /// Initialize with a Document object.
@@ -93,12 +102,12 @@ namespace Stenotype
             App = doc.Application;
             UiApp = new UIApplication(App);
             UiDoc = UiApp.ActiveUIDocument;
-            Title = doc.Title;
-            UserName = UiApp.Application.Username;
+            _title = doc.Title;
+            _userName = UiApp.Application.Username;
             ActiveView = UiDoc.ActiveView;
-            VersionNumber = UiApp.Application.VersionNumber;
-            VersionName = UiApp.Application.VersionName;
-            VersionBuild = UiApp.Application.VersionBuild;
+            _versionNumber = UiApp.Application.VersionNumber;
+            _versionName = UiApp.Application.VersionName;
+            _versionBuild = UiApp.Application.VersionBuild;
             RefDict = GetExternalReferencePaths();
             Serialized = JsonConvert.SerializeObject(this);
             JsonObject = JObject.Parse(Serialized);
@@ -120,37 +129,38 @@ namespace Stenotype
         }
 
         /// <summary>
-        /// Get paths of external references associated with the input document.
+        /// Get paths of external references associated with the Revit document used to initialize the class.
         /// </summary>
         /// <returns>A dictionary of reference types, and reference paths.</returns>
         public Dictionary<ExternalFileReferenceType, string> GetExternalReferencePaths()
         {
-            Dictionary<ExternalFileReferenceType, string> refDict = new Dictionary<ExternalFileReferenceType, string>();
+            Dictionary<ExternalFileReferenceType, string> referenceDictionary = new Dictionary<ExternalFileReferenceType, string>();
             string location = Doc.PathName;
             try
             {
                 ModelPath modelPath = ModelPathUtils.ConvertUserVisiblePathToModelPath(location);
                 TransmissionData transData = TransmissionData.ReadTransmissionData(modelPath);
-                ICollection<ElementId> externalReferences = transData.GetAllExternalFileReferenceIds();
-                foreach (ElementId elementId in externalReferences)
+                ICollection<ElementId> externalFileReferenceIds = transData.GetAllExternalFileReferenceIds();
+
+                foreach (ElementId referenceElementId in externalFileReferenceIds)
                 {
-                    ExternalFileReference extRef = transData.GetLastSavedReferenceData(elementId);
-                    ModelPath refPath = extRef.GetPath();
+                    ExternalFileReference externalFileReference = transData.GetLastSavedReferenceData(referenceElementId);
+                    ModelPath refPath = externalFileReference.GetPath();
                     string path = ModelPathUtils.ConvertModelPathToUserVisiblePath(refPath);
-                    ExternalFileReferenceType refType = extRef.ExternalFileReferenceType;
-                    refDict.Add(refType, path);
+                    ExternalFileReferenceType referenceType = externalFileReference.ExternalFileReferenceType;
+                    referenceDictionary.Add(referenceType, path);
                 }
 
             }
             catch (Exception exceptionReference) { Console.WriteLine(exceptionReference.ToString()); }
 
-            return refDict;
+            return referenceDictionary;
         }
 
         /// <summary>
         /// Get a list of line styles loaded in the document as Revit Category objects. These can be iterated over and/or passed to the LineStyleRAW class.
         /// </summary>
-        /// <returns>A list of Revit Category objects which represent line styles as settings.</returns>
+        /// <returns>A list of Revit Category objects which represent line styles as document settings.</returns>
         public List<Category> GetDocumentLineStyles()
         {
             List<Category> documentLineStyles = new List<Category>();
@@ -163,17 +173,6 @@ namespace Stenotype
             }
 
             return documentLineStyles;
-        }
-
-        /// <summary>
-        /// Get a JSON representation of the document class.
-        /// </summary>
-        /// <returns>JSON string with select exposed class properties/attributes.</returns>
-        public string SerializeDocumentClass()
-        {
-            var dRaw = new DocumentST(Doc);
-            string jsonString = JsonConvert.SerializeObject(dRaw, Formatting.Indented);
-            return jsonString;
         }
     }
 }

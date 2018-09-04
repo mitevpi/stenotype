@@ -31,14 +31,14 @@ namespace Stenotype
         /// </summary>
         [NonSerialized()] public JObject JsonObject;
 
-        [NonSerialized()] private readonly FilledRegion _filledRegion;
-        [JsonProperty()] private string FilledRegionName { get => _filledRegion.Name.ToString(); set { } }
+        [NonSerialized()] public readonly FilledRegion FilledRegion;
+        [JsonProperty()] private string FilledRegionName { get => FilledRegion.Name.ToString(); set { } }
 
         /// <summary>
         /// The Element ID of the Filled Region Element.
         /// </summary>
         [NonSerialized()] public readonly ElementId FilledRegionId;
-        [JsonProperty()] private int FilledRegionIdInteger { get => FilledRegionId.IntegerValue; set { } }
+        [JsonProperty()] private int FilledRegionIdInteger => FilledRegionId.IntegerValue;
 
 
         /// <summary>
@@ -49,9 +49,9 @@ namespace Stenotype
         {
             doc = filledRegion.Document;
             _app = doc.Application;
-            _filledRegion = filledRegion;
-            FilledRegionName = _filledRegion.Name;
-            FilledRegionId = _filledRegion.Id;
+            FilledRegion = filledRegion;
+            FilledRegionName = FilledRegion.Name;
+            FilledRegionId = FilledRegion.Id;
             Serialized = JsonConvert.SerializeObject(this);
             JsonObject = JObject.Parse(Serialized);
         }
@@ -74,7 +74,7 @@ namespace Stenotype
         /// <returns>An Edge Array object.</returns>
         public EdgeArray GetFilledRegionEdges(Options geomOption)
         {
-            GeometryElement geometryElement = _filledRegion.get_Geometry(geomOption);
+            GeometryElement geometryElement = FilledRegion.get_Geometry(geomOption);
             EdgeArray edgeArray = geometryElement.Select(g => (Solid)g).Select(s => s.Edges) as EdgeArray;
 
             return edgeArray;

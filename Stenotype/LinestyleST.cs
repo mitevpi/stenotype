@@ -13,8 +13,15 @@ namespace Stenotype
     /// </summary>
     public class LinestyleST
     {
-        [NonSerialized()] private readonly Document _doc;
-        [NonSerialized()] private readonly Category _subCatLineStyle;
+        /// <summary>
+        /// The Document to which the Category belongs to.
+        /// </summary>
+        [NonSerialized()] public readonly Document Doc;
+
+        /// <summary>
+        /// The Category object which holds the linestyles.
+        /// </summary>
+        [NonSerialized()] public readonly Category SubCategoryLinestyle;
 
         /// <summary>
         /// The JSON string representation of this class object.
@@ -40,64 +47,72 @@ namespace Stenotype
         /// The ElementID of the linestyle.
         /// </summary>
         [NonSerialized()] public readonly ElementId LineStyleId;
-        [JsonProperty()] private int LineStyleIdInteger { get => LineStyleId.IntegerValue; set { } }
+        [JsonProperty()] private int LineStyleIdInteger => LineStyleId.IntegerValue;
 
         /// <summary>
         /// The Element ID of the line pattern element.
         /// </summary>
         [NonSerialized()] public readonly ElementId LinePatternId;
-        [JsonProperty()] private int LinePatternIdInteger { get => LinePatternId.IntegerValue; set { } }
+        [JsonProperty()] private int LinePatternIdInteger => LinePatternId.IntegerValue;
+
+        private readonly string _lineStyleName;
+        private readonly string _lineStyleWeight;
+        private readonly List<int> _lineStyleRgb;
+        private readonly string _linePatternName;
+        private readonly List<double> _linePatternComponentsLength;
+        private readonly List<string> _linePatternComponentsType;
+
 
         /// <summary>
         /// The assigned name of the line style ast it appears Revit.
         /// </summary>
-        public string LineStyleName { get; }
+        public string LineStyleName => _lineStyleName;
 
         /// <summary>
         /// The weight of the line style as an integer.
         /// </summary>
-        public string LineStyleWeight { get; }
+        public string LineStyleWeight => _lineStyleWeight;
 
         /// <summary>
         /// An ordered list of numbers representing RGB values of the line style color.
         /// </summary>
-        public List<int> LineStyleRgb { get; }
+        public List<int> LineStyleRgb => _lineStyleRgb;
 
         /// <summary>
         /// The name of the line pattern applied to the line style.
         /// </summary>
-        public string LinePatternName { get; }
+        public string LinePatternName => _linePatternName;
 
         /// <summary>
         /// A list of the lengths of individual components of the line pattern as doubles.
         /// </summary>
-        public List<double> LinePatternComponentsLength { get; }
+        public List<double> LinePatternComponentsLength => _linePatternComponentsLength;
 
         /// <summary>
         ///  A list of the types of line elements which make up individual components of the line pattern.
         /// </summary>
-        public List<string> LinePatternComponentsType { get; }
+        public List<string> LinePatternComponentsType => _linePatternComponentsType;
 
 
         /// <summary>
         /// A Linestyle is a Document Setting in Revit, not a typical object. The Category object contains the Linestyle information.
         /// </summary>
         /// <param name="doc">The Revit Document object.</param>
-        /// <param name="subCatLineStyle">Revit Category object.</param>
-        public LinestyleST(Document doc, Category subCatLineStyle)
+        /// <param name="subCategoryLinestyle">Revit Category object.</param>
+        public LinestyleST(Document doc, Category subCategoryLinestyle)
         {
-            _doc = doc;
-            _subCatLineStyle = subCatLineStyle;
-            LineStyleName = _subCatLineStyle.Name;
-            LineStyleId = _subCatLineStyle.Id;
-            LineStyleWeight = _subCatLineStyle.GetLineWeight(GraphicsStyleType.Projection).ToString();
-            LineStyleRgb = GetLineStyleRgb();
+            Doc = doc;
+            SubCategoryLinestyle = subCategoryLinestyle;
+            _lineStyleName = SubCategoryLinestyle.Name;
+            LineStyleId = SubCategoryLinestyle.Id;
+            _lineStyleWeight = SubCategoryLinestyle.GetLineWeight(GraphicsStyleType.Projection).ToString();
+            _lineStyleRgb = GetLineStyleRgb();
             LinePatternId = GetLinePatternId();
-            LinePatternName = GetLinePatternName();
+            _linePatternName = GetLinePatternName();
             LinePatternElement = GetLinePatternElement();
             LinePattern = GetLinePattern();
-            LinePatternComponentsLength = GetLinePatternSegmentLengths();
-            LinePatternComponentsType = GetLinePatternSegmentTypes();
+            _linePatternComponentsLength = GetLinePatternSegmentLengths();
+            _linePatternComponentsType = GetLinePatternSegmentTypes();
             Serialized = JsonConvert.SerializeObject(this);
             JsonObject = JObject.Parse(Serialized);
         }
@@ -116,9 +131,9 @@ namespace Stenotype
             // Eliminate missing, null, or otherwise void color objects.
             try
             {
-                lineStyleRed = int.Parse(_subCatLineStyle.LineColor.Red.ToString());
-                lineStyleGreen = int.Parse(_subCatLineStyle.LineColor.Green.ToString());
-                lineStyleBlue = int.Parse(_subCatLineStyle.LineColor.Blue.ToString());
+                lineStyleRed = int.Parse(SubCategoryLinestyle.LineColor.Red.ToString());
+                lineStyleGreen = int.Parse(SubCategoryLinestyle.LineColor.Green.ToString());
+                lineStyleBlue = int.Parse(SubCategoryLinestyle.LineColor.Blue.ToString());
                  
 
                 if (Enumerable.Range(0, 255).Contains(lineStyleRed)) { }
@@ -153,7 +168,7 @@ namespace Stenotype
             // Account for deprecated API methods and missing objects from "Solid" line patterns.
             try
             {
-                linePatternId = _subCatLineStyle.GetLinePatternId(GraphicsStyleType.Projection);
+                linePatternId = SubCategoryLinestyle.GetLinePatternId(GraphicsStyleType.Projection);
             }
             catch (Exception exceptionPattern) { Console.WriteLine(exceptionPattern.ToString()); }
 
@@ -171,7 +186,7 @@ namespace Stenotype
             // Account for deprecated API methods and missing objects from "Solid" line patterns.
             try
             {
-                patternElement = _doc.GetElement(LinePatternId) as LinePatternElement;
+                patternElement = Doc.GetElement(LinePatternId) as LinePatternElement;
             }
             catch (Exception exceptionPattern) { Console.WriteLine(exceptionPattern.ToString()); }
 
