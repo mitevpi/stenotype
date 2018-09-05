@@ -61,36 +61,30 @@ namespace Stenotype
         /// </summary>
         [NonSerialized()] public readonly Dictionary<ExternalFileReferenceType, string> RefDict;
 
-        private readonly string _versionNumber;
-        private readonly string _versionName;
-        private readonly string _versionBuild;
-        private readonly string _userName;
-        private readonly string _title;
-
         /// <summary>
         /// The Revit Version Number.
         /// </summary>
-        public string VersionNumber => _versionNumber;
+        public string VersionNumber { get; }
 
         /// <summary>
         /// The name of the Revit Version.
         /// </summary>
-        public string VersionName => _versionName;
+        public string VersionName { get; }
 
         /// <summary>
         /// The Revit Build Number.
         /// </summary>
-        public string VersionBuild => _versionBuild;
+        public string VersionBuild { get; }
 
         /// <summary>
         /// The title of the Revit document.
         /// </summary>
-        public string Title => _title;
+        public string Title { get; }
 
         /// <summary>
         /// The user name associated with the Revit instance which instantiated this class.
         /// </summary>
-        public string UserName => _userName;
+        public string UserName { get; }
 
         /// <summary>
         /// Initialize with a Document object.
@@ -102,12 +96,12 @@ namespace Stenotype
             App = doc.Application;
             UiApp = new UIApplication(App);
             UiDoc = UiApp.ActiveUIDocument;
-            _title = doc.Title;
-            _userName = UiApp.Application.Username;
+            Title = doc.Title;
+            UserName = UiApp.Application.Username;
             ActiveView = UiDoc.ActiveView;
-            _versionNumber = UiApp.Application.VersionNumber;
-            _versionName = UiApp.Application.VersionName;
-            _versionBuild = UiApp.Application.VersionBuild;
+            VersionNumber = UiApp.Application.VersionNumber;
+            VersionName = UiApp.Application.VersionName;
+            VersionBuild = UiApp.Application.VersionBuild;
             RefDict = GetExternalReferencePaths();
             Serialized = JsonConvert.SerializeObject(this);
             JsonObject = JObject.Parse(Serialized);

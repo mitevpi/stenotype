@@ -55,43 +55,36 @@ namespace Stenotype
         [NonSerialized()] public readonly ElementId LinePatternId;
         [JsonProperty()] private int LinePatternIdInteger => LinePatternId.IntegerValue;
 
-        private readonly string _lineStyleName;
-        private readonly string _lineStyleWeight;
-        private readonly List<int> _lineStyleRgb;
-        private readonly string _linePatternName;
-        private readonly List<double> _linePatternComponentsLength;
-        private readonly List<string> _linePatternComponentsType;
-
 
         /// <summary>
         /// The assigned name of the line style ast it appears Revit.
         /// </summary>
-        public string LineStyleName => _lineStyleName;
+        public string LineStyleName { get; }
 
         /// <summary>
         /// The weight of the line style as an integer.
         /// </summary>
-        public string LineStyleWeight => _lineStyleWeight;
+        public string LineStyleWeight { get; }
 
         /// <summary>
         /// An ordered list of numbers representing RGB values of the line style color.
         /// </summary>
-        public List<int> LineStyleRgb => _lineStyleRgb;
+        public List<int> LineStyleRgb { get; }
 
         /// <summary>
         /// The name of the line pattern applied to the line style.
         /// </summary>
-        public string LinePatternName => _linePatternName;
+        public string LinePatternName { get; }
 
         /// <summary>
         /// A list of the lengths of individual components of the line pattern as doubles.
         /// </summary>
-        public List<double> LinePatternComponentsLength => _linePatternComponentsLength;
+        public List<double> LinePatternComponentsLength { get; }
 
         /// <summary>
         ///  A list of the types of line elements which make up individual components of the line pattern.
         /// </summary>
-        public List<string> LinePatternComponentsType => _linePatternComponentsType;
+        public List<string> LinePatternComponentsType { get; }
 
 
         /// <summary>
@@ -103,16 +96,16 @@ namespace Stenotype
         {
             Doc = doc;
             SubCategoryLinestyle = subCategoryLinestyle;
-            _lineStyleName = SubCategoryLinestyle.Name;
+            LineStyleName = SubCategoryLinestyle.Name;
             LineStyleId = SubCategoryLinestyle.Id;
-            _lineStyleWeight = SubCategoryLinestyle.GetLineWeight(GraphicsStyleType.Projection).ToString();
-            _lineStyleRgb = GetLineStyleRgb();
+            LineStyleWeight = SubCategoryLinestyle.GetLineWeight(GraphicsStyleType.Projection).ToString();
+            LineStyleRgb = GetLineStyleRgb();
             LinePatternId = GetLinePatternId();
-            _linePatternName = GetLinePatternName();
+            LinePatternName = GetLinePatternName();
             LinePatternElement = GetLinePatternElement();
             LinePattern = GetLinePattern();
-            _linePatternComponentsLength = GetLinePatternSegmentLengths();
-            _linePatternComponentsType = GetLinePatternSegmentTypes();
+            LinePatternComponentsLength = GetLinePatternSegmentLengths();
+            LinePatternComponentsType = GetLinePatternSegmentTypes();
             Serialized = JsonConvert.SerializeObject(this);
             JsonObject = JObject.Parse(Serialized);
         }
