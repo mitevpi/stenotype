@@ -53,6 +53,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="UtilST.cs" />
     <Compile Include="DocumentST.cs" />
     <Compile Include="FilledRegionST.cs" />
     <Compile Include="LinestyleST.cs" />

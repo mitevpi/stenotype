@@ -31,14 +31,25 @@ namespace Stenotype
         /// </summary>
         [NonSerialized()] public JObject JsonObject;
 
+        /// <summary>
+        /// The original Filled Region Element used to initialize the class.
+        /// </summary>
         [NonSerialized()] public readonly FilledRegion FilledRegion;
-        [JsonProperty()] private string FilledRegionName { get => FilledRegion.Name.ToString(); set { } }
+
+        /// <summary>
+        /// The name of the Filled Region Element.
+        /// </summary>
+        [JsonProperty()] public string FilledRegionName { get => FilledRegion.Name.ToString(); set { } }
 
         /// <summary>
         /// The Element ID of the Filled Region Element.
         /// </summary>
         [NonSerialized()] public readonly ElementId FilledRegionId;
-        [JsonProperty()] private int FilledRegionIdInteger => FilledRegionId.IntegerValue;
+
+        /// <summary>
+        /// The Element ID of the Filled Region Element as an Integer.
+        /// </summary>
+        [JsonProperty()] public int FilledRegionIdInteger => FilledRegionId.IntegerValue;
 
 
         /// <summary>
