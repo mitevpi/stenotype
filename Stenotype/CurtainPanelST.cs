@@ -62,10 +62,10 @@ namespace Stenotype
         }
 
         /// <summary>
-        /// Create the base bounding box intersect filter here. Any modificatin to the boxes or the filter should be done here.
+        /// Create the base bounding box intersect filter here. Any modification to the boxes or the filter should be done here.
         /// </summary>
         /// <param name="view">Revit View object.</param>
-        /// /// <param name="scaleFactor">The scaling factor to apply to the Bounding Box.</param>
+        /// <param name="scaleFactor">The scaling factor to apply to the Bounding Box.</param>
         /// <returns>Bounding Box Intersection filter.</returns>
         public BoundingBoxIntersectsFilter GetNeighborFilter(View view, double scaleFactor)
         {

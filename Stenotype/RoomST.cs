@@ -76,6 +76,35 @@ namespace Stenotype
         }
 
         /// <summary>
+        /// Get Room Edges as Curves.
+        /// </summary>
+        /// <returns>An list of Curves created from the Room Edges.</returns>
+        public List<Curve> GetRoomEdgesAsCurve()
+        {
+            List<Curve> curves = new List<Curve>();
+            EdgeArray edgeArray = GetRoomEdges();
+            foreach (Edge edge in edgeArray)
+            {
+                Curve edgeCurve = edge.AsCurve();
+                curves.Add(edgeCurve);
+            }
+
+            return curves;
+        }
+
+        /// <summary>
+        /// Get the location of the Room element as an XYZ Point.
+        /// </summary>
+        /// <returns>XYZ Point Object.</returns>
+        public XYZ GetRoomLocation()
+        {
+            LocationPoint location = Room.Location as LocationPoint;
+            XYZ roomPoint = location.Point;
+
+            return roomPoint;
+        }
+
+        /// <summary>
         /// Create a solid representation of the room's volume in the model via a DirectShape.
         /// </summary>
         public void GetRoomMass()
@@ -95,6 +124,34 @@ namespace Stenotype
                 t.Commit();
                 t.Dispose();
             }
+        }
+
+        /// <summary>
+        /// Create the base bounding box intersect filter here.
+        /// </summary>
+        /// <param name="view">Revit View object.</param>
+        /// <returns>Bounding Box Intersection filter.</returns>
+        private BoundingBoxIntersectsFilter GetNeighborFilter(View view)
+        {
+            // Create bounding box and outline element for the Revit element to check
+            BoundingBoxXYZ elementBoundingBox = Room.get_BoundingBox(view);
+            Outline elementOutline = new Outline(elementBoundingBox.Min, elementBoundingBox.Max);
+            BoundingBoxIntersectsFilter intersectsFilter = new BoundingBoxIntersectsFilter(elementOutline);
+
+            return intersectsFilter;
+        }
+
+        /// <summary>
+        /// Vanilla intersection checker to return all Revit Elements within the Room's bounding box.
+        /// </summary>
+        /// <param name="view">Revit View object.</param>
+        /// <returns>Collection of Revit elements.</returns>
+        public List<Element> GetElementsInRoom(View view)
+        {
+            BoundingBoxIntersectsFilter intersectsFilter = GetNeighborFilter(view);
+            List<Element> elementsInRoom = new FilteredElementCollector(Doc, view.Id).WherePasses(intersectsFilter).ToList();
+
+            return elementsInRoom;
         }
     }
 }
