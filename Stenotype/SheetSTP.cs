@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Collections.Generic;
 using Autodesk.Revit.DB;
@@ -12,7 +12,7 @@ namespace Stenotype
     /// <remarks>
     /// TODO.
     /// </remarks>
-    public class SheetST
+    public class SheetSTP
     {
         [NonSerialized()] private readonly Document _doc;
         [NonSerialized()] public readonly ViewSheet Sheet;
@@ -97,7 +97,7 @@ namespace Stenotype
         /// Initialize with a ViewSheet Object.
         /// </summary>
         /// <param name="sheet">A Revit ViewSheet object.</param>
-        public SheetST(ViewSheet sheet)
+        public SheetSTP(ViewSheet sheet)
         {
             _doc = sheet.Document;
             Sheet = sheet;

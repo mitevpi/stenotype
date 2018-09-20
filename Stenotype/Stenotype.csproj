@@ -56,9 +56,12 @@
   <ItemGroup>
     <Compile Include="CurtainPanelST.cs" />
     <Compile Include="ElementST.cs" />
+    <Compile Include="Export.cs" />
     <Compile Include="FilterST.cs" />
     <Compile Include="RoomST.cs" />
     <Compile Include="SheetST.cs" />
+    <Compile Include="SheetSTP.cs" />
+    <Compile Include="Testing\unitTest_RevitMacro.cs" />
     <Compile Include="UtilST.cs" />
     <Compile Include="DocumentST.cs" />
     <Compile Include="FilledRegionST.cs" />
@@ -68,6 +71,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Testing\CreateElevation.py" />
+    <Content Include="Testing\CreateElevationMarker.py" />
+    <Content Include="Testing\ElevationsFromRooms.py" />
+    <Content Include="Testing\unitTest_RPS.py" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
