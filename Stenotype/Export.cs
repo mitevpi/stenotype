@@ -27,8 +27,8 @@ namespace Stenotype
                                                                             .ToList();
             foreach (ViewSheet sheet in elements)
             {
-                SheetST shST = new SheetST(sheet);
-                sheetsJSON.Add(shST.SheetNumber, shST.JsonObject);
+                SheetSTX shStx = new SheetSTX(sheet);
+                sheetsJSON.Add(shStx.SheetNumber, shStx.JsonObject);
             }
             parentJson.Add("Sheets", sheetsJSON);
 

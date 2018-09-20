@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Collections.Generic;
 using Autodesk.Revit.DB;
@@ -20,7 +20,7 @@ namespace Stenotype
         /// <summary>
         /// A JSON serialized string representing this class object.
         /// </summary>
-        [NonSerialized()] public readonly string Serialized;
+        [NonSerialized()] public string Serialized;
 
         /// <summary>
         /// The JSON object representation of this class.
@@ -32,10 +32,6 @@ namespace Stenotype
         /// </summary>
         [NonSerialized()] public readonly List<ElementId> ViewportIDs;
 
-        /// <summary>
-        /// A list of the Viewports which are on the sheet as Revit Viewport Elements.
-        /// </summary>
-        [NonSerialized()] public readonly List<Viewport> ViewportElements;
 
         /// <summary>
         /// The Element ID of the Revit Sheet Element.
@@ -43,15 +39,6 @@ namespace Stenotype
         [NonSerialized()] public readonly ElementId SheetId;
         [JsonProperty()] private int SheetIdInteger { get => SheetId.IntegerValue; set { } }
 
-        /// <summary>
-        /// A dictionary containing Element IDs of viewports as integers, and their titles as strings.
-        /// </summary>
-        [JsonProperty()] public readonly Dictionary<int, string> ViewportElementsMap;
-
-        /// <summary>
-        /// TESTING NESTED CLASSES
-        /// </summary>
-        [JsonProperty()] public List<ViewportST> ViewportClasses { get; set; }
 
         /// <summary>
         /// The Sheet title.
@@ -111,9 +98,6 @@ namespace Stenotype
             DrawnBy = Sheet.LookupParameter("Drawn By").AsString();
             IssueDate = Sheet.LookupParameter("Sheet Issue Date").AsString();
             ViewportIDs = sheet.GetAllViewports().ToList();
-            ViewportElements = GetViewportElements();
-            ViewportElementsMap = GetViewportElementsMap();
-            ViewportClasses = GetViewportClasses();
             Serialized = JsonConvert.SerializeObject(this);
             JsonObject = JObject.Parse(Serialized);
         }
@@ -146,16 +130,5 @@ namespace Stenotype
             return viewportElementsMap;
         }
 
-        public List<ViewportST> GetViewportClasses()
-        {
-            List<ViewportST> viewportClassList = new List<ViewportST>();
-            foreach (Viewport viewportElement in ViewportElements)
-            {
-                ViewportST vST = new ViewportST(viewportElement);
-                viewportClassList.Add(vST);
-            }
-
-            return viewportClassList;
-        }
     }
 }
