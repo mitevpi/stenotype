@@ -27,9 +27,9 @@ namespace Stenotype
         [JsonProperty()] public readonly Dictionary<int, string> ViewportElementsMap;
 
         /// <summary>
-        /// TESTING NESTED CLASSES
+        /// Viewports which appear on this sheet serialized as JSON objects.
         /// </summary>
-        [JsonProperty()] public List<ViewportST> ViewportClasses { get; set; }
+        [JsonProperty()] public Dictionary<string, ViewportST> ViewportClasses { get; set; }
 
         /// <summary>
         /// Initialize with a ViewSheet Object.
@@ -44,16 +44,20 @@ namespace Stenotype
             JsonObject = JObject.Parse(Serialized);
         }
 
-        public List<ViewportST> GetViewportClasses()
+        /// <summary>
+        /// Get the viewports on the sheet as ViewportST Class Objects for serialization.
+        /// </summary>
+        /// <returns>Dictionary containing the View Name, and the ViewportST Class Object.</returns>
+        public Dictionary<string, ViewportST> GetViewportClasses()
         {
-            List<ViewportST> viewportClassList = new List<ViewportST>();
+            Dictionary<string, ViewportST> viewportClassDict = new Dictionary<string, ViewportST>();
             foreach (Viewport viewportElement in ViewportElements)
             {
-                ViewportST vST = new ViewportST(viewportElement);
-                viewportClassList.Add(vST);
+                ViewportSTX vSTX = new ViewportSTX(viewportElement);
+                viewportClassDict.Add(vSTX.ViewName ,vSTX);
             }
 
-            return viewportClassList;
+            return viewportClassDict;
         }
     }
 }

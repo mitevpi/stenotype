@@ -68,11 +68,13 @@
     <Compile Include="LinestyleST.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewportST.cs" />
+    <Compile Include="ViewportSTX.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Testing\BasicTester.py" />
     <Content Include="Testing\CreateElevation.py" />
     <Content Include="Testing\CreateElevationMarker.py" />
     <Content Include="Testing\ElevationsFromRooms.py" />

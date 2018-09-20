@@ -24,14 +24,9 @@ namespace Stenotype
         [NonSerialized()] public readonly View View;
 
         /// <summary>
-        /// A list of all Revit Elements contained within the Viewport.
-        /// </summary>
-        [NonSerialized()] public ICollection<Element> ViewportElements;
-
-        /// <summary>
         /// A JSON serialized string representing this class object.
         /// </summary>
-        [NonSerialized()] public readonly string Serialized;
+        [NonSerialized()] public string Serialized;
 
         /// <summary>
         /// The JSON object representation of this class.
@@ -110,7 +105,6 @@ namespace Stenotype
             ViewScale = View.Scale.ToString();
             ViewType = View.ViewType.ToString();
             ViewDetailLevel = View.DetailLevel.ToString();
-            ViewportElements = GetElementsInViewport();
             Serialized = JsonConvert.SerializeObject(this);
             JsonObject = JObject.Parse(Serialized);
         }

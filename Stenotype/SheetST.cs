@@ -39,7 +39,6 @@ namespace Stenotype
         [NonSerialized()] public readonly ElementId SheetId;
         [JsonProperty()] private int SheetIdInteger { get => SheetId.IntegerValue; set { } }
 
-
         /// <summary>
         /// The Sheet title.
         /// </summary>
