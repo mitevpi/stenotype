@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -12,36 +14,38 @@ namespace Stenotype
 {
     public class FamilyST
     {
-        [NonSerialized()] private Family _family;
+        public ObjectId Id { get; set; }
+
+        [NonSerialized()] [BsonIgnore] private Family _family;
 
         /// <summary>
         /// A JSON serialized string representing this class object.
         /// </summary>
-        [NonSerialized()] public readonly string Serialized;
+        [NonSerialized()] [BsonIgnore] public readonly string Serialized;
 
         /// <summary>
         /// The JSON object representation of this class.
         /// </summary>
-        [NonSerialized()] public JObject JsonObject;
+        [NonSerialized()] [BsonIgnore] public JObject JsonObject;
 
-        [NonSerialized()] public readonly Document doc;
-        [JsonProperty()] private string HostDocument => doc.Title.ToString();
+        [NonSerialized()] [BsonIgnore] public readonly Document doc;
+        [JsonProperty()] public string HostDocument { get => doc.Title.ToString(); set { } }
 
         /// <summary>
         /// The Element ID of the Revit Family Element.
         /// </summary>
-        [NonSerialized()] public readonly ElementId ElementId;
-        [JsonProperty()] private int ElementIdInteger => ElementId.IntegerValue;
+        [NonSerialized()] [BsonIgnore] public readonly ElementId ElementId;
+        [JsonProperty()] public int ElementIdInteger { get => ElementId.IntegerValue; set { } }
 
         //[NonSerialized()] public readonly Category Category;
         //[JsonProperty()] private string CategoryString { get => Category.Name ; set { } }
 
-        [NonSerialized()] public readonly Category FamilyCategory;
-        [JsonProperty()] private string FamilyCategoryString => FamilyCategory.Name;
+        [NonSerialized()] [BsonIgnore] public readonly Category FamilyCategory;
+        [JsonProperty()] public string FamilyCategoryString { get => FamilyCategory.Name; set { } }
 
-        public string Name { get; }
-        public long FamilyFileSize { get; }
-        public string FamilyCreator { get; }
+        public string Name { get; set; }
+        public long FamilyFileSize { get; set; }
+        public string FamilyCreator { get; set; }
 
         public FamilyST(Family family)
         {
