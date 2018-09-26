@@ -10,7 +10,7 @@ using Newtonsoft.Json.Linq;
 namespace Stenotype
 {
     /// <summary>
-    /// Wrapper class for Revit Filled Region Objects.</summary>
+    /// Extension of the base SheetST class for serialization/data export. May include performance-intensive methods.</summary>
     /// <remarks>
     /// TODO.
     /// </remarks>

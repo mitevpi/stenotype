@@ -11,7 +11,7 @@ using Newtonsoft.Json.Linq;
 namespace Stenotype
 {
     /// <summary>
-    /// Wrapper class for Revit Viewport objects.</summary>
+    /// Extension of the base ViewportST class for serialization/data export. May include performance-intensive methods.</summary>
     /// <remarks>
     /// TODO.
     /// </remarks>
