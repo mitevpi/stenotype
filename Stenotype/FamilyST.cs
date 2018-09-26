@@ -43,9 +43,16 @@ namespace Stenotype
         [NonSerialized()] [BsonIgnore] public readonly Category FamilyCategory;
         [JsonProperty()] public string FamilyCategoryString { get => FamilyCategory.Name; set { } }
 
+        /// <summary>
+        /// A dictionary of parameter names, and associated values pulled from the element.
+        /// </summary>
+        public Dictionary<string, string> FamilyParameterValues { get; set; }
+
         public string Name { get; set; }
         public long FamilyFileSize { get; set; }
         public string FamilyCreator { get; set; }
+        public int FamilyTypesCount { get; set; }
+        public int PlacedInstancesCount { get; set; }
 
         public FamilyST(Family family)
         {
@@ -56,6 +63,9 @@ namespace Stenotype
             //Category = family.Category;
             FamilyCategory = family.FamilyCategory;
             FamilyFileSize = GetFamilyFileSize();
+            FamilyParameterValues = GetFamilyParameterValues();
+            FamilyTypesCount = GetValidTypes().Count;
+            PlacedInstancesCount = GetFamilyInstances().Count;
             FamilyCreator = WorksharingUtils.GetWorksharingTooltipInfo(doc, _family.Id).Creator;
             Serialized = JsonConvert.SerializeObject(this);
             JsonObject = JObject.Parse(Serialized);
@@ -102,6 +112,62 @@ namespace Stenotype
                 }
             }
             return familySize;
+        }
+
+        /// <summary>
+        /// Get parameter names and their values for parameters associated with the Family.
+        /// </summary>
+        /// <returns>A string dictionary of parameter names, and their values.</returns>
+        public Dictionary<string, string> GetFamilyParameterValues()
+        {
+            Dictionary<string, string> familyParameterValues = new Dictionary<string, string>();
+            ParameterSet elementParameterSet = _family.Parameters;
+            foreach (Parameter parameter in elementParameterSet)
+            {
+                string parameterName = parameter.Definition.Name;
+                string parameterType = parameter.StorageType.ToString();
+                string parameterValue = "HIDDEN";
+
+                if (parameterType == "ElementId")
+                {
+                    parameterValue = parameter.AsValueString();
+                }
+                else if (parameterType == "Integer")
+                {
+                    parameterValue = parameter.AsInteger().ToString();
+                }
+                else if (parameterType == "String")
+                {
+                    parameterValue = parameter.AsString();
+                }
+                else { }
+
+                if (familyParameterValues.ContainsKey(parameterName)) { }
+                else
+                {
+                    familyParameterValues.Add(parameterName, parameterValue);
+                }
+            }
+            return familyParameterValues;
+        }
+
+        public List<FamilyInstance> GetFamilyInstances()
+        {
+            List<FamilyInstance> familyInstances = new FilteredElementCollector(doc)
+                                                    .OfClass(typeof(FamilyInstance))
+                                                    .ToElements()
+                                                    .Where(x => x.Name == Name)
+                                                    .Select(f => (FamilyInstance)f)
+                                                    .ToList();
+
+            return familyInstances;
+        }
+
+        public List<ElementId> GetValidTypes()
+        {
+            List<ElementId> typeIds = _family.GetValidTypes().ToList();
+
+            return typeIds;
         }
     }
 }
