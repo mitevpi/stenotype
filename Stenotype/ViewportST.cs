@@ -100,7 +100,7 @@ namespace Stenotype
             ViewportName = viewport.Name;
             ViewportId = viewport.Id;
             ViewName = viewport.LookupParameter("View Name").AsString();
-            ViewTemplate = viewport.LookupParameter("View Template").AsString();
+            ViewTemplate = GetViewTemplateName();
             ViewTitleOnSheet = viewport.LookupParameter("Title on Sheet").AsString();
             ViewOwnerViewId = viewport.OwnerViewId;
             ViewId = viewport.ViewId;
@@ -120,6 +120,22 @@ namespace Stenotype
         {
             ICollection<Element> viewportElements = new FilteredElementCollector(_doc, ViewId).WhereElementIsNotElementType().ToElements();
             return viewportElements;
+        }
+
+        public string GetViewTemplateName()
+        {
+            string viewTemplateName = "None";
+            try
+            {
+                ElementId viewTemplateParameter = Viewport.LookupParameter("View Template").AsElementId();
+                viewTemplateName = _doc.GetElement(viewTemplateParameter).Name;
+            }
+            catch
+            {
+                viewTemplateName = "None";
+            }
+            
+            return viewTemplateName;
         }
 
         /// <summary>

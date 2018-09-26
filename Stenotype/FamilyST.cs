@@ -152,9 +152,8 @@ namespace Stenotype
         {
             List<FamilyInstance> familyInstances = new FilteredElementCollector(doc)
                                                     .OfClass(typeof(FamilyInstance))
-                                                    .ToElements()
-                                                    .Where(x => x.Name == Name)
                                                     .Select(f => (FamilyInstance)f)
+                                                    .Where(x => x.Symbol.Family.Name == Name || x.Name == Name)
                                                     .ToList();
 
             return familyInstances;
