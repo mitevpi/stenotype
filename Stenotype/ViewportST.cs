@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
+using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -15,76 +16,78 @@ namespace Stenotype
     /// </remarks>
     public class ViewportST
     {
-        [NonSerialized()] private readonly Document _doc;
-        [NonSerialized()] public readonly Viewport Viewport;
+        [NonSerialized()] [BsonIgnore] public readonly Viewport Viewport;
 
         /// <summary>
         /// The Revit View element which is being represented through this Viewport.
         /// </summary>
-        [NonSerialized()] public readonly View View;
+        [NonSerialized()] [BsonIgnore] public readonly View View;
 
         /// <summary>
         /// A JSON serialized string representing this class object.
         /// </summary>
-        [NonSerialized()] public string Serialized;
+        [NonSerialized()] [BsonIgnore] public string Serialized;
 
         /// <summary>
         /// The JSON object representation of this class.
         /// </summary>
-        [NonSerialized()] public JObject JsonObject;
+        [NonSerialized()] [BsonIgnore] public JObject JsonObject;
+
+        [NonSerialized()] [BsonIgnore] public readonly Document _doc;
+        [JsonProperty()] public string HostDocument { get => _doc.Title.ToString(); set { } }
 
         /// <summary>
         /// The ElementID of the Viewport Element.
         /// </summary>
-        [NonSerialized()] public readonly ElementId ViewportId;
-        [JsonProperty()] private int ViewportIdInteger => ViewportId.IntegerValue;
+        [NonSerialized()] [BsonIgnore] public readonly ElementId ViewportId;
+        [JsonProperty()] public int ViewportIdInteger { get => ViewportId.IntegerValue; set { } }
 
         /// <summary>
         /// The Element ID of the Viewport Owner element.
         /// </summary>
-        [NonSerialized()] public readonly ElementId ViewOwnerViewId;
-        [JsonProperty()] private int ViewOwnerViewIdInteger => ViewOwnerViewId.IntegerValue;
+        [NonSerialized()] [BsonIgnore] public readonly ElementId ViewOwnerViewId;
+        [JsonProperty()] public int ViewOwnerViewIdInteger { get => ViewOwnerViewId.IntegerValue; set { } }
 
         /// <summary>
         /// The Element ID of the View Element that is being represented through this Viewport.
         /// </summary>
-        [NonSerialized()] public readonly ElementId ViewId;
-        [JsonProperty()] private int ViewIdInteger => ViewId.IntegerValue;
+        [NonSerialized()] [BsonIgnore] public readonly ElementId ViewId;
+        [JsonProperty()] public int ViewIdInteger { get => ViewId.IntegerValue; set { } }
 
         /// <summary>
         /// The name/title of the Viewport Element.
         /// </summary>
-        public string ViewportName { get; }
+        public string ViewportName { get; set; }
 
         /// <summary>
         /// The name/title of the View which is represented through this Viewport.
         /// </summary>
-        public string ViewName { get; }
+        public string ViewName { get; set; }
 
         /// <summary>
         /// The name/title of the View Template associated with the viewport.
         /// </summary>
-        public string ViewTemplate { get; }
+        public string ViewTemplate { get; set; }
 
         /// <summary>
         /// The title of the view on the sheet that is being represented through this Viewport.
         /// </summary>
-        public string ViewTitleOnSheet { get; }
+        public string ViewTitleOnSheet { get; set; }
 
         /// <summary>
         /// The scale of the view that is being represented through this Viewport.
         /// </summary>
-        public string ViewScale { get; }
+        public string ViewScale { get; set; }
 
         /// <summary>
         /// The type of view that is being represented through this Viewport.
         /// </summary>
-        public string ViewType { get; }
+        public string ViewType { get; set; }
 
         /// <summary>
         /// The detail level of the view that is being represented through this Viewport.
         /// </summary>
-        public string ViewDetailLevel { get; }
+        public string ViewDetailLevel { get; set; }
 
         /// <summary>
         /// A class for working with Revit Viewport Elements.

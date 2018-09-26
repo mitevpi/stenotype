@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using Autodesk.Revit.DB;
+using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -14,70 +15,72 @@ namespace Stenotype
     /// </remarks>
     public class SheetST
     {
-        [NonSerialized()] private readonly Document _doc;
-        [NonSerialized()] public readonly ViewSheet Sheet;
+        [NonSerialized()] [BsonIgnore] public readonly ViewSheet Sheet;
 
         /// <summary>
         /// A JSON serialized string representing this class object.
         /// </summary>
-        [NonSerialized()] public string Serialized;
+        [NonSerialized()] [BsonIgnore] public string Serialized;
 
         /// <summary>
         /// The JSON object representation of this class.
         /// </summary>
-        [NonSerialized()] public JObject JsonObject;
+        [NonSerialized()] [BsonIgnore] public JObject JsonObject;
 
         /// <summary>
         /// A list of the Viewports' Element IDs which are on the sheet.
         /// </summary>
-        [NonSerialized()] public readonly List<ElementId> ViewportIDs;
+        [NonSerialized()] [BsonIgnore] public readonly List<ElementId> ViewportIDs;
+        [JsonProperty()] public List<int> ViewportIds { get => ViewportIDs.Select( id => id.IntegerValue).ToList(); set { } }
 
+        [NonSerialized()] [BsonIgnore] public readonly Document _doc;
+        [JsonProperty()] public string HostDocument { get => _doc.Title.ToString(); set { } }
 
         /// <summary>
         /// The Element ID of the Revit Sheet Element.
         /// </summary>
-        [NonSerialized()] public readonly ElementId SheetId;
-        [JsonProperty()] private int SheetIdInteger { get => SheetId.IntegerValue; set { } }
+        [NonSerialized()] [BsonIgnore] public readonly ElementId SheetId;
+        [JsonProperty()] public int SheetIdInteger { get => SheetId.IntegerValue; set { } }
 
         /// <summary>
         /// The Sheet title.
         /// </summary>
-        public string SheetName { get; }
+        public string SheetName { get; set; }
 
         /// <summary>
         /// The Sheet number.
         /// </summary>
-        public string SheetNumber { get; }
+        public string SheetNumber { get; set; }
 
         /// <summary>
         /// The username of the last user to edit the sheet.
         /// </summary>
-        public string EditedBy { get; }
+        public string EditedBy { get; set; }
 
         /// <summary>
         /// The Sheet's Approved By parameter value.
         /// </summary>
-        public string ApprovedBy { get; }
+        public string ApprovedBy { get; set; }
 
         /// <summary>
         /// The Sheet's Designed By parameter value.
         /// </summary>
-        public string DesignedBy { get; }
+        public string DesignedBy { get; set; }
 
         /// <summary>
         /// The Sheet's Checked By parameter value.
         /// </summary>
-        public string CheckedBy { get; }
+        public string CheckedBy { get; set; }
 
         /// <summary>
         /// The Sheet's Drawn By parameter value.
         /// </summary>
-        public string DrawnBy { get; }
+        public string DrawnBy { get; set; }
 
         /// <summary>
         /// The Sheet's Issue Date parameter value.
         /// </summary>
-        public string IssueDate { get; }
+        public string IssueDate { get; set; }
 
         /// <summary>
         /// Initialize with a ViewSheet Object.
@@ -90,7 +93,7 @@ namespace Stenotype
             SheetName = Sheet.LookupParameter("Sheet Name").AsString();
             SheetNumber = Sheet.LookupParameter("Sheet Number").AsString();
             SheetId = Sheet.Id;
-            EditedBy = Sheet.LookupParameter("Edited by").AsString();
+            //EditedBy = Sheet.LookupParameter("Edited by").AsString();
             ApprovedBy = Sheet.LookupParameter("Approved By").AsString();
             DesignedBy = Sheet.LookupParameter("Designed By").AsString();
             CheckedBy = Sheet.LookupParameter("Checked By").AsString();

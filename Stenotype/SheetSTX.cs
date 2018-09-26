@@ -2,6 +2,8 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using Autodesk.Revit.DB;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -14,22 +16,24 @@ namespace Stenotype
     /// </remarks>
     public class SheetSTX : SheetST
     {
-        [NonSerialized()] private readonly Document _doc;
+        public ObjectId Id { get; set; }
 
         /// <summary>
         /// A list of the Viewports which are on the sheet as Revit Viewport Elements.
         /// </summary>
-        [NonSerialized()] public readonly List<Viewport> ViewportElements;
+        [NonSerialized()] [BsonIgnore] public readonly List<Viewport> ViewportElements;
 
         /// <summary>
         /// A dictionary containing Element IDs of viewports as integers, and their titles as strings.
         /// </summary>
-        [JsonProperty()] public readonly Dictionary<int, string> ViewportElementsMap;
+        [JsonProperty()] [BsonIgnore] public readonly Dictionary<int, string> ViewportElementsMap;
 
         /// <summary>
         /// Viewports which appear on this sheet serialized as JSON objects.
         /// </summary>
-        [JsonProperty()] public Dictionary<string, ViewportST> ViewportClasses { get; set; }
+        [JsonProperty()] [BsonIgnore] public Dictionary<string, ViewportST> ViewportClasses { get; set; }
+
+        public List<string> ViewTitles { get; set; }
 
         /// <summary>
         /// Initialize with a ViewSheet Object.
@@ -39,7 +43,8 @@ namespace Stenotype
         {
             ViewportElements = GetViewportElements();
             ViewportElementsMap = GetViewportElementsMap();
-            ViewportClasses = GetViewportClasses();
+            //ViewTitles = ViewportElementsMap.Values.ToList();
+            //ViewportClasses = GetViewportClasses();
             Serialized = JsonConvert.SerializeObject(this);
             JsonObject = JObject.Parse(Serialized);
         }

@@ -60,6 +60,7 @@
     <Compile Include="CurtainPanelST.cs" />
     <Compile Include="ElementST.cs" />
     <Compile Include="Export.cs" />
+    <Compile Include="FamilySTX.cs" />
     <Compile Include="FamilyST.cs" />
     <Compile Include="FilterST.cs" />
     <Compile Include="RoomST.cs" />

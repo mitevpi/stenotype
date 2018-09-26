@@ -3,6 +3,8 @@ using System.Linq;
 using System.Collections.Generic;
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -15,17 +17,18 @@ namespace Stenotype
     /// </remarks>
     public class ViewportSTX: ViewportST
     {
-        [NonSerialized()] private readonly Document _doc;
+        public ObjectId Id { get; set; }
 
         /// <summary>
         /// A list of all Revit Elements contained within the Viewport.
         /// </summary>
-        [NonSerialized()] public readonly ICollection<Element> ElementsInViewport;
+        [NonSerialized()] [BsonIgnore] public readonly ICollection<Element> ElementsInViewport;
+        [JsonProperty()] public List<int> ElementsInViewportIds { get; set; }
 
         /// <summary>
         /// Viewports which appear on this sheet serialized as JSON objects.
         /// </summary>
-        [JsonProperty()] public Dictionary<string, ElementST> ElementsInViewportClasses { get; set; }
+        [JsonProperty()] [BsonIgnore] public Dictionary<string, ElementST> ElementsInViewportClasses { get; set; }
 
         /// <summary>
         /// A class for working with Revit Viewport Elements.
@@ -33,9 +36,9 @@ namespace Stenotype
         /// <param name="viewport">The Revit Viewport Object.</param>
         public ViewportSTX(Viewport viewport) : base(viewport)
         {
-            _doc = viewport.Document;
             ElementsInViewport = GetElementsInViewport();
-            ElementsInViewportClasses = GetElementClasses();
+            ElementsInViewportIds = GetElementsInViewport().Select(e => e.Id.IntegerValue).ToList();
+            //ElementsInViewportClasses = GetElementClasses();
             Serialized = JsonConvert.SerializeObject(this);
             JsonObject = JObject.Parse(Serialized);
         }

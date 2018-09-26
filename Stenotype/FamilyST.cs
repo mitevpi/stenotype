@@ -2,10 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
-using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -14,14 +11,13 @@ namespace Stenotype
 {
     public class FamilyST
     {
-        public ObjectId Id { get; set; }
 
         [NonSerialized()] [BsonIgnore] private Family _family;
 
         /// <summary>
         /// A JSON serialized string representing this class object.
         /// </summary>
-        [NonSerialized()] [BsonIgnore] public readonly string Serialized;
+        [NonSerialized()] [BsonIgnore] public string Serialized;
 
         /// <summary>
         /// The JSON object representation of this class.
@@ -46,13 +42,14 @@ namespace Stenotype
         /// <summary>
         /// A dictionary of parameter names, and associated values pulled from the element.
         /// </summary>
-        public Dictionary<string, string> FamilyParameterValues { get; set; }
+        /// TODO: WRITE CUSTOM CSV EXPORTER FROM MONGO TO IGNORE 
+        [BsonIgnore] public Dictionary<string, string> FamilyParameterValues { get; set; }
 
         public string Name { get; set; }
-        public long FamilyFileSize { get; set; }
         public string FamilyCreator { get; set; }
         public int FamilyTypesCount { get; set; }
-        public int PlacedInstancesCount { get; set; }
+        public bool IsParametricFamily { get; set; }
+        public bool IsModeledInPlaceFamily { get; set; }
 
         public FamilyST(Family family)
         {
@@ -62,10 +59,10 @@ namespace Stenotype
             ElementId = family.Id;
             //Category = family.Category;
             FamilyCategory = family.FamilyCategory;
-            FamilyFileSize = GetFamilyFileSize();
             FamilyParameterValues = GetFamilyParameterValues();
-            FamilyTypesCount = GetValidTypes().Count;
-            PlacedInstancesCount = GetFamilyInstances().Count;
+            FamilyTypesCount = family.GetFamilySymbolIds().Count;
+            IsParametricFamily = family.IsParametric;
+            IsModeledInPlaceFamily = family.IsInPlace;
             FamilyCreator = WorksharingUtils.GetWorksharingTooltipInfo(doc, _family.Id).Creator;
             Serialized = JsonConvert.SerializeObject(this);
             JsonObject = JObject.Parse(Serialized);
@@ -161,13 +158,6 @@ namespace Stenotype
                                                     .ToList();
 
             return familyInstances;
-        }
-
-        public List<ElementId> GetValidTypes()
-        {
-            List<ElementId> typeIds = _family.GetValidTypes().ToList();
-
-            return typeIds;
         }
     }
 }
