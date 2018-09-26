@@ -4,7 +4,8 @@ Stenotype is a helper class library for working with the Revit API. It consists 
 
 
 ### Documentation
-API documentation for authors is included as .chm help-file: [API Documentation](https://github.com/mitevpi/stenotype/blob/master/Documentation/Help/Stenotype%20API%20Documentation.chm). Documentation created with Sandcastle Help File Builder.
+API documentation for authors is included as .chm help-file: [API Documentation](https://github.com/mitevpi/stenotype/blob/master/Documentation/Help/Stenotype%20API%20Documentation.chm). 
+Documentation created with Sandcastle Help File Builder.
 
 ### C# Usage
 Typical usage within a C# Revit environment (Visual Studio - [Revit External Command](http://usa.autodesk.com/adsk/servlet/index?siteID=123112&id=20132893) or [Revit Add-In](https://github.com/Andrey-Bushman/Revit2018AddInTemplateSet)).
@@ -12,12 +13,12 @@ Typical usage within a C# Revit environment (Visual Studio - [Revit External Com
 
 ```c#
 using ST = Stenotype;
-
-Options geomOption = ST.FilledRegionsST.CreateGeometryOption() //static usage
-ST.FilledRegionsST frST = new ST.FilledRegionsST(doc, fr) //non-static usage
-
-frST.edgeArray; // Class properties return objects
+Options geomOption = ST.FilledRegionsST.CreateGeometryOption() // static usage, returns a .NET object
+UtilST.GetSingleUserSelection(uidoc) // static usage, gets a single selected item by the user's mouse
 ```
+
+#### Sample C# Usage
+Wrapper classes are instantiated by taking a corresponding Revit API class as a constructor (use a Viewport Class as a constructor to pass in a for a ViewportST class). They offer shortcut methods, and the opportunity to seralize to JSON of the public exposed wrapper class members and store/export the data. Uploading the same information to a databse is currently WIP. 
 
 ```c#
 using Newtonsoft.Json;
@@ -87,8 +88,18 @@ filled_region_object = filled_region_collection[0] # Take the first Filled Regio
 docST = ST.DocumentST(doc) # Instantiate Document class with Document object constructor
 frST = ST.FilledRegionsST(doc, filled_region_object) # Instantiate Filled Region class with Filled Region object constructor
 
-print (frST.graphicsStyles) # Some properties hold .NET objects
+print (frST.graphicsStyles) # Some (most) properties hold .NET objects which also have a serializable value
 print (docST.title) # Others hold a string/int representation
 
 print (docST.Serialized) # Returns a JSON string of the public properties - can be exported, or written to a database.
+```
+
+
+```python
+
+# Assuming the user has clicked on a single room in Revit
+selectedObjectInRevit = ST.UtilST.GetSingleUserSelection(uidoc)
+roomObj = ST.RoomST(selectedObjectInRevit) # Create a Stenotype wrapper class with the Room Class as the constructor
+roomPoint = roomObj.GetRoomLocation() # Get the location of a room as an XYZ point.
+roomElements =  roomObj.GetElementsInRoom(doc.ActiveView) # Return all elements in the Room's bounding box
 ```
