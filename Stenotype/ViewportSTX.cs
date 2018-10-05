@@ -31,16 +31,36 @@ namespace Stenotype
         [JsonProperty()] [BsonIgnore] public Dictionary<string, ElementST> ElementsInViewportClasses { get; set; }
 
         /// <summary>
+        /// A list of Element Category Names which will be applied as a filter when collecting elements within the Viewport.
+        /// </summary>
+        [BsonIgnore] private List<string> IncludedElementsForCollection { get; set; }
+
+        /// <summary>
         /// A class for working with Revit Viewport Elements.
         /// </summary>
         /// <param name="viewport">The Revit Viewport Object.</param>
         public ViewportSTX(Viewport viewport) : base(viewport)
         {
-            ElementsInViewport = GetElementsInViewport();
-            ElementsInViewportIds = GetElementsInViewport().Select(e => e.Id.IntegerValue).ToList();
+            // TODO: REMOVE TEMPORARY FIX FOR EXCLUDING 3D CONTENT FROM SERIALIZATION/DATABASE WRITE
+            //ElementsInViewport = GetElementsInViewportByViewType(new List<string> { "ThreeD", "FloorPlan", "Elevation", "Section" });
+            IncludedElementsForCollection = SetIncludedElementCategories();
+            ElementsInViewport = GetElementsInViewportByCategory(IncludedElementsForCollection);
+            ElementsInViewportIds = ElementsInViewport.Select(e => e.Id.IntegerValue).ToList();
             //ElementsInViewportClasses = GetElementClasses();
             Serialized = JsonConvert.SerializeObject(this);
             JsonObject = JObject.Parse(Serialized);
+        }
+
+        private List<string> SetIncludedElementCategories()
+        {
+            List<string> elementCategoriesToInclude = new List<string>
+            {
+                "Door Tags", "Window Tags", "Detail Items", "Dimensions", "Door Tags", "Generic Annotations",
+                "Automatic Sketch Dimensions", "Lines", "Model Groups", "Room Tags", "Text Notes", "Detail Lines",
+                "Keynote Tags"
+            };
+
+            return elementCategoriesToInclude;
         }
 
         /// <summary>

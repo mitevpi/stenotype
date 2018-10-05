@@ -113,13 +113,52 @@ namespace Stenotype
         }
 
         /// <summary>
-        /// Get the Revit Elements which appear within the boudning box of the viewport.
+        /// Get the Revit Elements which appear within the bounding box of the viewport.
         /// </summary>
         /// <returns>An ICollection of Revit Element objects.</returns>
         public ICollection<Element> GetElementsInViewport()
         {
             ICollection<Element> viewportElements = new FilteredElementCollector(_doc, ViewId).WhereElementIsNotElementType().ToElements();
             return viewportElements;
+        }
+
+        public ICollection<Element> GetElementsInViewportByViewType(List<string> excludedViewTypes)
+        {
+            ICollection<Element> viewportElements = new List<Element>();
+
+            if (excludedViewTypes.Contains(ViewType))
+            {
+                //do nothing
+            }
+            else
+            {
+                viewportElements = new FilteredElementCollector(_doc, ViewId).WhereElementIsNotElementType().ToElements();
+            }
+
+
+            return viewportElements;
+        }
+
+        public List<Element> GetElementsInViewportByCategory(List<string> includedElementCategories)
+        {
+            IEnumerable<Element> viewportElementsFiltered = new List<Element>();
+            try
+            {
+                List<Element> viewportElements = GetElementsInViewport().ToList();
+                viewportElementsFiltered = from element in viewportElements
+                                            where element.Category != null
+                                            where includedElementCategories.Contains(element.Category.Name)
+                                            select element;
+
+                var temp2 = viewportElementsFiltered;
+                var temp = viewportElementsFiltered.ToList();
+            }
+            catch
+            {
+
+            }
+            
+        return viewportElementsFiltered.ToList();
         }
 
         public string GetViewTemplateName()

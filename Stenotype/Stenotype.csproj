@@ -84,7 +84,9 @@
     <Content Include="Testing\CreateElevationMarker.py" />
     <Content Include="Testing\ElevationsFromRooms.py" />
     <Content Include="Testing\FamilyTester.py" />
+    <Content Include="Testing\GetElementCategories.py" />
     <Content Include="Testing\unitTest_RPS.py" />
+    <Content Include="Testing\ViewporTester.py" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
