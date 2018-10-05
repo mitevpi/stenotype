@@ -105,7 +105,8 @@ namespace Stenotype
             ViewOwnerViewId = viewport.OwnerViewId;
             ViewId = viewport.ViewId;
             View = _doc.GetElement(ViewId) as View;
-            ViewScale = View.Scale.ToString();
+            //ViewScale = View.Scale.ToString();
+            ViewScale = viewport.LookupParameter("View Scale").AsValueString();
             ViewType = View.ViewType.ToString();
             ViewDetailLevel = View.DetailLevel.ToString();
             Serialized = JsonConvert.SerializeObject(this);

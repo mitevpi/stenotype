@@ -40,13 +40,16 @@ namespace Stenotype
         /// </summary>
         /// <param name="viewport">The Revit Viewport Object.</param>
         public ViewportSTX(Viewport viewport) : base(viewport)
-        {
-            // TODO: REMOVE TEMPORARY FIX FOR EXCLUDING 3D CONTENT FROM SERIALIZATION/DATABASE WRITE
+        {   
+            // DEPRECATED PROPERTIES
             //ElementsInViewport = GetElementsInViewportByViewType(new List<string> { "ThreeD", "FloorPlan", "Elevation", "Section" });
-            IncludedElementsForCollection = SetIncludedElementCategories();
-            ElementsInViewport = GetElementsInViewportByCategory(IncludedElementsForCollection);
-            ElementsInViewportIds = ElementsInViewport.Select(e => e.Id.IntegerValue).ToList();
             //ElementsInViewportClasses = GetElementClasses();
+
+            // SAMPLE PROPERTIES FOR INCLUDING ELEMENT COLLECTION
+            //IncludedElementsForCollection = SetIncludedElementCategories();
+            //ElementsInViewport = GetElementsInViewportByCategory(IncludedElementsForCollection);
+            //ElementsInViewportIds = ElementsInViewport.Select(e => e.Id.IntegerValue).ToList();
+
             Serialized = JsonConvert.SerializeObject(this);
             JsonObject = JObject.Parse(Serialized);
         }
