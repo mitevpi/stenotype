@@ -123,6 +123,12 @@ namespace Stenotype
             return viewportElements;
         }
 
+        /// <summary>
+        /// Get a list of elements in the Viewport's associated View. Filter by View Type to avoid taxing collection on views
+        /// such as 3D ("ThreeD") or plan/section.
+        /// </summary>
+        /// <param name="excludedViewTypes">List of View Types as strings which will not have element collection performed on them.</param>
+        /// <returns>A collection of elements in the viewport if the View Type wasn't excluded.</returns>
         public ICollection<Element> GetElementsInViewportByViewType(List<string> excludedViewTypes)
         {
             ICollection<Element> viewportElements = new List<Element>();
@@ -150,16 +156,37 @@ namespace Stenotype
                                             where element.Category != null
                                             where includedElementCategories.Contains(element.Category.Name)
                                             select element;
-
-                var temp2 = viewportElementsFiltered;
-                var temp = viewportElementsFiltered.ToList();
             }
-            catch
-            {
-
-            }
+            catch { }
             
         return viewportElementsFiltered.ToList();
+        }
+
+        public List<Element> GetElementsInViewportByCategoryAndViewType(List<string> includedElementCategories, List<string> excludedViewTypes)
+        {
+            ICollection<Element> viewportElements = new List<Element>();
+
+            if (excludedViewTypes.Contains(ViewType))
+            {
+                //do nothing
+            }
+            else
+            {
+                viewportElements = new FilteredElementCollector(_doc, ViewId).WhereElementIsNotElementType().ToElements();
+            }
+
+            IEnumerable<Element> viewportElementsFiltered = new List<Element>();
+
+            try
+            {
+                viewportElementsFiltered = from element in viewportElements
+                                            where element.Category != null
+                                            where includedElementCategories.Contains(element.Category.Name)
+                                            select element;
+            }
+            catch { }
+
+            return viewportElementsFiltered.ToList();
         }
 
         public string GetViewTemplateName()
