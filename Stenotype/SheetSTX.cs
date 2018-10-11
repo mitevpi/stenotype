@@ -16,6 +16,9 @@ namespace Stenotype
     /// </remarks>
     public class SheetSTX : SheetST
     {
+        /// <summary>
+        /// ID parameter for MongoDB interaction.
+        /// </summary>
         public ObjectId Id { get; set; }
 
         /// <summary>
@@ -33,6 +36,9 @@ namespace Stenotype
         /// </summary>
         [JsonProperty()] [BsonIgnore] public Dictionary<string, ViewportST> ViewportClasses { get; set; }
 
+        /// <summary>
+        /// A list of the titles of each View on the sheet.
+        /// </summary>
         public List<string> ViewTitles { get; set; }
 
         /// <summary>

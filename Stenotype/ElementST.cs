@@ -1,9 +1,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -32,8 +30,11 @@ namespace Stenotype
         /// </summary>
         [NonSerialized()] public JObject JsonObject;
 
+        /// <summary>
+        /// The Element object used to instantiate this class.
+        /// </summary>
         [NonSerialized()] public readonly Element Element;
-        [JsonProperty()] private string ElementString { get => Element.Name.ToString(); set { } }
+        [JsonProperty()] private string ElementString { get => Element.Name; set { } }
 
         /// <summary>
         /// A dictionary of parameter names, and associated values pulled from the element.
@@ -46,11 +47,11 @@ namespace Stenotype
         /// <param name="element">Revit Element object.</param>
         public ElementST(Element element)
         {
-            this.Doc = element.Document;
-            this.Element = element;
-            this.ElementParameterValues = GetElementParameterValues();
-            this.Serialized = JsonConvert.SerializeObject(this);
-            this.JsonObject = JObject.Parse(Serialized);
+            Doc = element.Document;
+            Element = element;
+            ElementParameterValues = GetElementParameterValues();
+            Serialized = JsonConvert.SerializeObject(this);
+            JsonObject = JObject.Parse(Serialized);
         }
 
         /// <summary>

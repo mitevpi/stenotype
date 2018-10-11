@@ -9,10 +9,18 @@ using Newtonsoft.Json.Linq;
 
 namespace Stenotype
 {
+    /// <summary>
+    /// Wrapper class for Revit Family objects.</summary>
+    /// <remarks>
+    /// TODO.
+    /// </remarks>
     public class FamilyST
     {
 
-        [NonSerialized()] [BsonIgnore] private Family _family;
+        /// <summary>
+        /// The Family object used to instantiate the class.
+        /// </summary>
+        [NonSerialized()] [BsonIgnore] public Family Family;
 
         /// <summary>
         /// A JSON serialized string representing this class object.
@@ -24,19 +32,37 @@ namespace Stenotype
         /// </summary>
         [NonSerialized()] [BsonIgnore] public JObject JsonObject;
 
+        /// <summary>
+        /// The Revit Document object to which the Family belongs.
+        /// </summary>
         [NonSerialized()] [BsonIgnore] public readonly Document doc;
+
+        /// <summary>
+        /// The Revit Document object to which the Family belongs as a title (string) for serialization.
+        /// </summary>
         [JsonProperty()] public string HostDocument { get => doc.Title.ToString(); set { } }
 
         /// <summary>
         /// The Element ID of the Revit Family Element.
         /// </summary>
         [NonSerialized()] [BsonIgnore] public readonly ElementId ElementId;
+
+        /// <summary>
+        /// The Element ID of the Revit Family Element as an integer for serialization.
+        /// </summary>
         [JsonProperty()] public int ElementIdInteger { get => ElementId.IntegerValue; set { } }
 
         //[NonSerialized()] public readonly Category Category;
         //[JsonProperty()] private string CategoryString { get => Category.Name ; set { } }
 
+        /// <summary>
+        /// The Category to which the Family object belongs to.
+        /// </summary>
         [NonSerialized()] [BsonIgnore] public readonly Category FamilyCategory;
+
+        /// <summary>
+        /// The Category to which the Family object belongs to as a name (string) for serialization.
+        /// </summary>
         [JsonProperty()] public string FamilyCategoryString { get => FamilyCategory.Name; set { } }
 
         /// <summary>
@@ -45,15 +71,38 @@ namespace Stenotype
         /// TODO: WRITE CUSTOM CSV EXPORTER FROM MONGO TO IGNORE 
         [BsonIgnore] public Dictionary<string, string> FamilyParameterValues { get; set; }
 
+        /// <summary>
+        /// The name of the Family.
+        /// </summary>
         public string Name { get; set; }
+
+        /// <summary>
+        /// The username of the author of the Family, if there is one.
+        /// </summary>
         public string FamilyCreator { get; set; }
+
+        /// <summary>
+        /// The number of Family types that are available for this family.
+        /// </summary>
         public int FamilyTypesCount { get; set; }
+
+        /// <summary>
+        /// Whether or not this Family has any parametric relationships inside.
+        /// </summary>
         public bool IsParametricFamily { get; set; }
+
+        /// <summary>
+        /// Whether or not the Family is modeled in place, or created in the Family editor and loaded in.
+        /// </summary>
         public bool IsModeledInPlaceFamily { get; set; }
 
+        /// <summary>
+        /// A class for working with Revit Family Elements.
+        /// </summary>
+        /// <param name="family">A Revit Family object.</param>
         public FamilyST(Family family)
         {
-            _family = family;
+            Family = family;
             doc = family.Document;
             Name = family.Name;
             ElementId = family.Id;
@@ -63,18 +112,24 @@ namespace Stenotype
             FamilyTypesCount = family.GetFamilySymbolIds().Count;
             IsParametricFamily = family.IsParametric;
             IsModeledInPlaceFamily = family.IsInPlace;
-            FamilyCreator = WorksharingUtils.GetWorksharingTooltipInfo(doc, _family.Id).Creator;
+            FamilyCreator = WorksharingUtils.GetWorksharingTooltipInfo(doc, Family.Id).Creator;
             Serialized = JsonConvert.SerializeObject(this);
             JsonObject = JObject.Parse(Serialized);
         }
 
+        /// <summary>
+        /// Try to get the file size of a Revit Family. If the Family is originally loaded in locally, the
+        /// file size will be found through the path name of the Family. If not (which is most of the time), the
+        /// Families will be exported to the desktop, and file sizes will be harvested from that directory.
+        /// </summary>
+        /// <returns></returns>
         public long GetFamilyFileSize()
         {
             long familySize = 0;
 
-            if (_family.IsEditable == true)
+            if (Family.IsEditable == true)
             {
-                Document familyDoc = doc.EditFamily(_family);
+                Document familyDoc = doc.EditFamily(Family);
                 string familyPath = familyDoc.PathName;
 
                 if (familyPath != "")
@@ -86,7 +141,7 @@ namespace Stenotype
                 {
                     try
                     {
-                        string fileName = _family.Name + ".rfa";
+                        string fileName = Family.Name + ".rfa";
                         string dirPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Quarry";
                         System.IO.Directory.CreateDirectory(dirPath);
                         string familyPathNew = dirPath + "\\" + fileName;
@@ -118,7 +173,7 @@ namespace Stenotype
         public Dictionary<string, string> GetFamilyParameterValues()
         {
             Dictionary<string, string> familyParameterValues = new Dictionary<string, string>();
-            ParameterSet elementParameterSet = _family.Parameters;
+            ParameterSet elementParameterSet = Family.Parameters;
             foreach (Parameter parameter in elementParameterSet)
             {
                 string parameterName = parameter.Definition.Name;
@@ -148,6 +203,10 @@ namespace Stenotype
             return familyParameterValues;
         }
 
+        /// <summary>
+        /// Get all the placed instances of this Family.
+        /// </summary>
+        /// <returns>A list of FamilyInstance objects.</returns>
         public List<FamilyInstance> GetFamilyInstances()
         {
             List<FamilyInstance> familyInstances = new FilteredElementCollector(doc)

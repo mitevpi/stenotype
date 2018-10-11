@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using MongoDB.Bson.Serialization.Attributes;
@@ -16,6 +17,9 @@ namespace Stenotype
     /// </remarks>
     public class ViewportST
     {
+        /// <summary>
+        /// The original Viewport element used to insantiate the class.
+        /// </summary>
         [NonSerialized()] [BsonIgnore] public readonly Viewport Viewport;
 
         /// <summary>
@@ -32,26 +36,46 @@ namespace Stenotype
         /// The JSON object representation of this class.
         /// </summary>
         [NonSerialized()] [BsonIgnore] public JObject JsonObject;
-
+        
+        /// <summary>
+        /// The Document object to which the Viewport belongs.
+        /// </summary>
         [NonSerialized()] [BsonIgnore] public readonly Document _doc;
-        [JsonProperty()] public string HostDocument { get => _doc.Title.ToString(); set { } }
+        
+        /// <summary>
+        /// The Document object to which the Viewport belongs as the title (string) for serialization.
+        /// </summary>
+        [JsonProperty()] public string HostDocument { get => _doc.Title; set { } }
 
         /// <summary>
         /// The ElementID of the Viewport Element.
         /// </summary>
         [NonSerialized()] [BsonIgnore] public readonly ElementId ViewportId;
+        
+        /// <summary>
+        /// The ElementID of the Viewport Element as an integer for serialization.
+        /// </summary>
         [JsonProperty()] public int ViewportIdInteger { get => ViewportId.IntegerValue; set { } }
 
         /// <summary>
         /// The Element ID of the Viewport Owner element.
         /// </summary>
         [NonSerialized()] [BsonIgnore] public readonly ElementId ViewOwnerViewId;
+        
+        /// <summary>
+        /// The Element ID of the Viewport Owner element as an integer for serialization.
+        /// </summary>
         [JsonProperty()] public int ViewOwnerViewIdInteger { get => ViewOwnerViewId.IntegerValue; set { } }
 
         /// <summary>
         /// The Element ID of the View Element that is being represented through this Viewport.
         /// </summary>
         [NonSerialized()] [BsonIgnore] public readonly ElementId ViewId;
+        
+        /// <summary>
+        /// The Element ID of the View Element that is being represented through this Viewport as an integer
+        /// for serialization.
+        /// </summary>
         [JsonProperty()] public int ViewIdInteger { get => ViewId.IntegerValue; set { } }
 
         /// <summary>
@@ -146,6 +170,13 @@ namespace Stenotype
             return viewportElements;
         }
 
+        /// <summary>
+        /// Get a list of elements in the Viewport's associated View. Filter by Element Type to avoid collecting
+        /// unnecessary elements like Cameras, Project Survey Points, etc.
+        /// </summary>
+        /// <param name="includedElementCategories">List of Element Categories as strings to include in the
+        /// collection.</param>
+        /// <returns>A list of Elements which pass the criteria.</returns>
         public List<Element> GetElementsInViewportByCategory(List<string> includedElementCategories)
         {
             IEnumerable<Element> viewportElementsFiltered = new List<Element>();
@@ -157,18 +188,30 @@ namespace Stenotype
                                             where includedElementCategories.Contains(element.Category.Name)
                                             select element;
             }
-            catch { }
+            catch (Exception elementCollectorException)
+            {
+                Debug.Print(elementCollectorException.Message);
+            }
             
         return viewportElementsFiltered.ToList();
         }
 
+        /// <summary>
+        /// Get a list list of elements in the Viewport's associated View. Filter by Element Type and View Type
+        /// for curated collection.
+        /// </summary>
+        /// <param name="includedElementCategories">List of Element Categories as strings to include in the
+        /// collection.</param>
+        /// <param name="excludedViewTypes">List of View Types as strings which will not have element collection
+        /// performed on them.</param>
+        /// <returns>A list of Element objects which pass the criteria.</returns>
         public List<Element> GetElementsInViewportByCategoryAndViewType(List<string> includedElementCategories, List<string> excludedViewTypes)
         {
             ICollection<Element> viewportElements = new List<Element>();
 
             if (excludedViewTypes.Contains(ViewType))
             {
-                //do nothing
+                Debug.Print("IGNORED VIEW FOR ELEMENT COLLECTION");
             }
             else
             {
@@ -184,11 +227,18 @@ namespace Stenotype
                                             where includedElementCategories.Contains(element.Category.Name)
                                             select element;
             }
-            catch { }
+            catch (Exception elementCollectorException)
+            {
+                Debug.Print(elementCollectorException.Message);
+            }
 
             return viewportElementsFiltered.ToList();
         }
 
+        /// <summary>
+        /// Get the name of the View Template assigned to the View reference by the Viewport.
+        /// </summary>
+        /// <returns>The name of the View Template.</returns>
         public string GetViewTemplateName()
         {
             string viewTemplateName = "None";
@@ -241,7 +291,7 @@ namespace Stenotype
                 }
                 catch (Exception boundingBoxException)
                 {
-                    //Debug.Print(boundingBoxException.Message);
+                    Debug.Print(boundingBoxException.Message);
                 }
             }
 
@@ -272,7 +322,7 @@ namespace Stenotype
                 }
                 catch (Exception boundingBoxException)
                 {
-                    //Debug.Print(boundingBoxException.Message);
+                    Debug.Print(boundingBoxException.Message);
                 }
             }
 

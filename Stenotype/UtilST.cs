@@ -46,6 +46,7 @@ namespace Stenotype
         /// Get the first X amount of items from a user's selection.
         /// </summary>
         /// <param name="uiDoc">The UIDocument object from which to pull user selection.</param>
+        /// <param name="numberOfSelections">The number of items from the selection to return.</param>
         /// <returns>List of Revit Element objects.</returns>
         public static List<Element> GetMultpleUserSelection(UIDocument uiDoc, int numberOfSelections)
         {

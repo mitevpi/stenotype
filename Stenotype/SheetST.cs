@@ -15,6 +15,9 @@ namespace Stenotype
     /// </remarks>
     public class SheetST
     {
+        /// <summary>
+        /// The original Sheet object used to instantiate the class.
+        /// </summary>
         [NonSerialized()] [BsonIgnore] public readonly ViewSheet Sheet;
 
         /// <summary>
@@ -30,16 +33,31 @@ namespace Stenotype
         /// <summary>
         /// A list of the Viewports' Element IDs which are on the sheet.
         /// </summary>
-        [NonSerialized()] [BsonIgnore] public readonly List<ElementId> ViewportIDs;
-        [JsonProperty()] public List<int> ViewportIds { get => ViewportIDs.Select( id => id.IntegerValue).ToList(); set { } }
+        [NonSerialized()] [BsonIgnore] public readonly List<ElementId> ViewportIds;
+        
+        /// <summary>
+        /// A list of the Viewports' Element IDs which are on the sheet as integers for serialization.
+        /// </summary>
+        [JsonProperty()] public List<int> ViewportIdIntegers { get => ViewportIds.Select( id => id.IntegerValue).ToList(); set { } }
 
-        [NonSerialized()] [BsonIgnore] public readonly Document _doc;
-        [JsonProperty()] public string HostDocument { get => _doc.Title.ToString(); set { } }
+        /// <summary>
+        /// The Document object to which the Sheet belongs to.
+        /// </summary>
+        [NonSerialized()] [BsonIgnore] public readonly Document Doc;
+        
+        /// <summary>
+        /// The Document object to which the Sheet belongs to as a title (string) for serialization.
+        /// </summary>
+        [JsonProperty()] public string HostDocument { get => Doc.Title; set { } }
 
         /// <summary>
         /// The Element ID of the Revit Sheet Element.
         /// </summary>
         [NonSerialized()] [BsonIgnore] public readonly ElementId SheetId;
+        
+        /// <summary>
+        /// The Element ID of the Revit Sheet Element as an integer for serialization.
+        /// </summary>
         [JsonProperty()] public int SheetIdInteger { get => SheetId.IntegerValue; set { } }
 
         /// <summary>
@@ -88,7 +106,7 @@ namespace Stenotype
         /// <param name="sheet">A Revit ViewSheet object.</param>
         public SheetST(ViewSheet sheet)
         {
-            _doc = sheet.Document;
+            Doc = sheet.Document;
             Sheet = sheet;
             SheetName = Sheet.LookupParameter("Sheet Name").AsString();
             SheetNumber = Sheet.LookupParameter("Sheet Number").AsString();
@@ -99,7 +117,7 @@ namespace Stenotype
             CheckedBy = Sheet.LookupParameter("Checked By").AsString();
             DrawnBy = Sheet.LookupParameter("Drawn By").AsString();
             IssueDate = Sheet.LookupParameter("Sheet Issue Date").AsString();
-            ViewportIDs = sheet.GetAllViewports().ToList();
+            ViewportIds = sheet.GetAllViewports().ToList();
             Serialized = JsonConvert.SerializeObject(this);
             JsonObject = JObject.Parse(Serialized);
         }
@@ -110,7 +128,7 @@ namespace Stenotype
         /// <returns>A list of Revit Viewport objects.</returns>
         public List<Viewport> GetViewportElements()
         {
-            List<Viewport> viewportElements = ViewportIDs.Select(id => _doc.GetElement(id) as Viewport).ToList();
+            List<Viewport> viewportElements = ViewportIds.Select(id => Doc.GetElement(id) as Viewport).ToList();
 
             return viewportElements;
         }
@@ -122,9 +140,9 @@ namespace Stenotype
         public Dictionary<int, string> GetViewportElementsMap()
         {
             Dictionary<int, string> viewportElementsMap = new Dictionary<int, string>();
-            foreach (ElementId viewportId in ViewportIDs)
+            foreach (ElementId viewportId in ViewportIds)
             {
-                Element tempViewportObject = _doc.GetElement(viewportId);
+                Element tempViewportObject = Doc.GetElement(viewportId);
                 int tempViewportId = viewportId.IntegerValue;
                 string name = tempViewportObject.LookupParameter("View Name").AsString();
                 viewportElementsMap.Add(tempViewportId, name);

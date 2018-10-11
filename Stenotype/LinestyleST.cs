@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Collections.Generic;
 using Autodesk.Revit.DB;
-using Autodesk.Revit.UI;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -199,7 +198,7 @@ namespace Stenotype
             {
                 try
                 {
-                    linePatternName = LinePatternElement.Name.ToString();
+                    linePatternName = LinePatternElement.Name;
                 }
                 catch (Exception exceptionPattern)
                 {

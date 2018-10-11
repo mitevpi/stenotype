@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
@@ -30,7 +29,7 @@ namespace Stenotype
         /// The document.
         /// </summary>
         [NonSerialized()] public readonly Document Doc;
-        [JsonProperty()] private string DocString => Doc.Title.ToString();
+        [JsonProperty()] private string DocString => Doc.Title;
 
         /// <summary>
         /// The Application hosting the document.
@@ -54,7 +53,7 @@ namespace Stenotype
         /// The active view of the document at the time of instantiating this class.
         /// </summary>
         [NonSerialized()] public readonly View ActiveView;
-        [JsonProperty()] private string ActiveViewString => ActiveView.Title.ToString();
+        [JsonProperty()] private string ActiveViewString => ActiveView.Title;
 
         /// <summary>
         /// A dictionary of reference types, and reference paths for the files linked to the source Revit document.

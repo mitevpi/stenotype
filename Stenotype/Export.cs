@@ -8,8 +8,16 @@ using System.Linq;
 
 namespace Stenotype
 {
+    /// <summary>
+    /// A collection of samples illustrating data export using the Stenotype wrapper classes and methods.
+    /// </summary>
     public class Export
     {
+        /// <summary>
+        /// Export a JSON report of the sheets in the input document. Serialized properties are
+        /// pulled from the class properties of the SheetST wrapper class.
+        /// </summary>
+        /// <param name="doc">The Revit Document object to operate within.</param>
         public static void ExportSheetReport(Document doc)
         {
             // CREATE LOGGING JSON

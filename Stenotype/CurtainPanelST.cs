@@ -33,6 +33,9 @@ namespace Stenotype
         /// </summary>
         [NonSerialized()] public JObject JsonObject;
 
+        /// <summary>
+        /// The Panel object used to instantiate this class.
+        /// </summary>
         [NonSerialized()] public readonly Panel Panel;
         [JsonProperty()] private string PanelString { get => Panel.Name; }
 
@@ -142,7 +145,7 @@ namespace Stenotype
             // Define Horizontal Rules
             IEnumerable<Panel> horizontal = from box in neighborBoundingBoxes
                                             where box.Value.Min.DistanceTo(testPanelBoundingBox.Min) != 0
-                                            where ApproximatelyEquals(box.Value.Min.Z, testPanelBoundingBox.Min.Z, 0.25) || ApproximatelyEquals(box.Value.Max.Z, testPanelBoundingBox.Max.Z, 0.25) == true
+                                            where ApproximatelyEquals(box.Value.Min.Z, testPanelBoundingBox.Min.Z, 0.25) || ApproximatelyEquals(box.Value.Max.Z, testPanelBoundingBox.Max.Z, 0.25)
                                             orderby box.Value.Min.DistanceTo(testPanelBoundingBox.Min) ascending
                                             select box.Key;
             horizontal = horizontal.Take(2);
@@ -151,8 +154,8 @@ namespace Stenotype
             IEnumerable<Panel> above = from box in neighborBoundingBoxes
                                     where box.Value.Min.Z > testPanelBoundingBox.Min.Z && box.Value.Max.Z > testPanelBoundingBox.Max.Z
                                     where ApproximatelyEquals(box.Value.Min.Z, testPanelBoundingBox.Min.Z, 0.05) == false && ApproximatelyEquals(box.Value.Max.Z, testPanelBoundingBox.Max.Z, 0.05) == false
-                                    where ApproximatelyEquals(box.Value.Min.X, testPanelBoundingBox.Min.X, 0.10) == true || ApproximatelyEquals(box.Value.Max.X, testPanelBoundingBox.Max.X, 0.10) == true
-                                    where ApproximatelyEquals(box.Value.Min.Y, testPanelBoundingBox.Min.Y, 0.10) == true || ApproximatelyEquals(box.Value.Max.Y, testPanelBoundingBox.Max.Y, 0.10) == true
+                                    where ApproximatelyEquals(box.Value.Min.X, testPanelBoundingBox.Min.X, 0.10) || ApproximatelyEquals(box.Value.Max.X, testPanelBoundingBox.Max.X, 0.10)
+                                    where ApproximatelyEquals(box.Value.Min.Y, testPanelBoundingBox.Min.Y, 0.10) || ApproximatelyEquals(box.Value.Max.Y, testPanelBoundingBox.Max.Y, 0.10)
                                     orderby box.Value.Min.DistanceTo(testPanelBoundingBox.Min) ascending
                                     select box.Key;
             above = above.Take(1);
@@ -161,8 +164,8 @@ namespace Stenotype
             IEnumerable<Panel> below = from box in neighborBoundingBoxes
                                     where box.Value.Min.Z < testPanelBoundingBox.Min.Z && box.Value.Max.Z < testPanelBoundingBox.Max.Z
                                     where ApproximatelyEquals(box.Value.Min.Z, testPanelBoundingBox.Min.Z, 0.10) == false && ApproximatelyEquals(box.Value.Max.Z, testPanelBoundingBox.Max.Z, 0.05) == false
-                                    where ApproximatelyEquals(box.Value.Min.X, testPanelBoundingBox.Min.X, 0.10) == true || ApproximatelyEquals(box.Value.Max.X, testPanelBoundingBox.Max.X, 0.10) == true
-                                    where ApproximatelyEquals(box.Value.Min.Y, testPanelBoundingBox.Min.Y, 0.10) == true || ApproximatelyEquals(box.Value.Max.Y, testPanelBoundingBox.Max.Y, 0.10) == true
+                                    where ApproximatelyEquals(box.Value.Min.X, testPanelBoundingBox.Min.X, 0.10) || ApproximatelyEquals(box.Value.Max.X, testPanelBoundingBox.Max.X, 0.10)
+                                    where ApproximatelyEquals(box.Value.Min.Y, testPanelBoundingBox.Min.Y, 0.10) || ApproximatelyEquals(box.Value.Max.Y, testPanelBoundingBox.Max.Y, 0.10)
                                     orderby box.Value.Min.DistanceTo(testPanelBoundingBox.Min) ascending
                                     select box.Key;
             below = below.Take(1);
@@ -198,16 +201,16 @@ namespace Stenotype
 
             string panelType = "NONE";
 
-            Autodesk.Revit.DB.View view = doc.ActiveView;
-            ICollection<Autodesk.Revit.DB.Panel> fullPanelCollection = new FilteredElementCollector(doc, view.Id).OfCategory(BuiltInCategory.OST_CurtainWallPanels)
-                                                                            .WhereElementIsNotElementType().Select(p => (Autodesk.Revit.DB.Panel)p).ToList();
+            View view = doc.ActiveView;
+            ICollection<Panel> fullPanelCollection = new FilteredElementCollector(doc, view.Id).OfCategory(BuiltInCategory.OST_CurtainWallPanels)
+                                                                            .WhereElementIsNotElementType().Select(p => (Panel)p).ToList();
             // Iterate over collected panels trying to find neighbors
-            foreach (Autodesk.Revit.DB.Panel panel in fullPanelCollection)
+            foreach (Panel panel in fullPanelCollection)
             {
-                Autodesk.Revit.DB.Panel edgeA = null; string edgeAName = "NONE"; string edgeAid = "0"; string edgeAType = "NONE";
-                Autodesk.Revit.DB.Panel edgeB = null; string edgeBName = "NONE"; string edgeBid = "0"; string edgeBType = "NONE";
-                Autodesk.Revit.DB.Panel above = null; string aboveName = "NONE"; string aboveId = "0"; string aboveType = "NONE";
-                Autodesk.Revit.DB.Panel below = null; string belowName = "NONE"; string belowId = "0"; string belowType = "NONE";
+                Panel edgeA = null; string edgeAName = "NONE"; string edgeAid = "0"; string edgeAType = "NONE";
+                Panel edgeB = null; string edgeBName = "NONE"; string edgeBid = "0"; string edgeBType = "NONE";
+                Panel above = null; string aboveName = "NONE"; string aboveId = "0"; string aboveType = "NONE";
+                Panel below = null; string belowName = "NONE"; string belowId = "0"; string belowType = "NONE";
 
                 try
                 {

@@ -4,10 +4,7 @@ using System.Collections.Generic;
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Architecture;
-using Autodesk.Revit.UI;
-using Autodesk.Revit.UI.Selection;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace Stenotype
 {
@@ -35,8 +32,12 @@ namespace Stenotype
         /// </summary>
         [NonSerialized()] public readonly EdgeArray EdgeArray;
 
+        /// <summary>
+        /// The Room object used to instantiate the class.
+        /// </summary>
         [NonSerialized()] public readonly Room Room;
-        [JsonProperty()] private string RoomName { get => Room.Name.ToString(); }
+        
+        [JsonProperty()] private string RoomName { get => Room.Name; }
 
         /// <summary>
         /// A class for working with the Revit Room object.
@@ -99,7 +100,7 @@ namespace Stenotype
         public XYZ GetRoomLocation()
         {
             LocationPoint location = Room.Location as LocationPoint;
-            XYZ roomPoint = location.Point;
+            XYZ roomPoint = location?.Point;
 
             return roomPoint;
         }

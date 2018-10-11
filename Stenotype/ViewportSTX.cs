@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
-using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.DB;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
@@ -17,12 +16,19 @@ namespace Stenotype
     /// </remarks>
     public class ViewportSTX: ViewportST
     {
+        /// <summary>
+        /// ID parameter for MongoDB interaction.
+        /// </summary>
         public ObjectId Id { get; set; }
 
         /// <summary>
         /// A list of all Revit Elements contained within the Viewport.
         /// </summary>
         [NonSerialized()] [BsonIgnore] public readonly ICollection<Element> ElementsInViewport;
+        
+        /// <summary>
+        /// A list of all Revit Elements contained within the Viewport as Element ID integers for serialization.
+        /// </summary>
         [JsonProperty()] public List<int> ElementsInViewportIds { get; set; }
 
         /// <summary>
